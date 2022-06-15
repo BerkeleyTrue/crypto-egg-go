@@ -1,7 +1,6 @@
 package app
 
 import (
-	"net"
 	"net/http"
 	"os"
 	"os/signal"
@@ -9,41 +8,21 @@ import (
 	"syscall"
 
 	"github.com/berkeleytrue/crypto-agg-go/config"
+	"github.com/berkeleytrue/crypto-agg-go/infra/httpserver"
 	"github.com/gin-gonic/gin"
 )
 
-var wg sync.WaitGroup
-
-type Server struct {
-	server *http.Server
-}
-
-func (s *Server) start() {
-	wg.Add(1)
-	go func() {
-		s.server.ListenAndServe()
-	}()
-}
-
-func Run(cfg *config.Config) {
+func Run(cfg *config.Config, wg *sync.WaitGroup) {
 	handler := gin.Default()
 	handler.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"message": "hello world"})
 	})
 
-	httpServer := &http.Server{
-		Handler: handler,
-	}
+  s := httpserver.New(handler, &cfg.HTTP, wg)
 
-	httpServer.Addr = net.JoinHostPort("", cfg.HTTP.Port)
-
-	s := &Server{
-		server: httpServer,
-	}
-
-	s.start()
-	wg.Wait()
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
 
+  httpserver.Start(s)
+  wg.Wait()
 }
