@@ -1,41 +1,55 @@
 package httpserver
 
 import (
+	"context"
 	"fmt"
 	"net/http"
-	"sync"
+	"time"
 
 	"github.com/berkeleytrue/crypto-agg-go/config"
 )
 
 type Server struct {
 	server *http.Server
-	wg     *sync.WaitGroup
 	notify chan error
 }
 
-func (s *Server) Start() {
-	s.wg.Add(1)
+func (s *Server) Start() func() {
+
 	go func() {
 		fmt.Printf("Starting Server on %s\n", s.server.Addr)
-		s.notify <- s.server.ListenAndServe()
-		close(s.notify)
+		if err := s.server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			s.notify <- err
+		}
 	}()
+
+	return func() {
+		fmt.Println("Shutdown requested")
+		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+
+		defer func() {
+			cancel()
+			close(s.notify)
+		}()
+
+		s.server.SetKeepAlivesEnabled(false)
+		s.notify <- s.server.Shutdown(ctx)
+		fmt.Println("Shutdown complete")
+	}
 }
 
 func (s *Server) Notify() <-chan error {
 	return s.notify
 }
 
-func New(handler http.Handler, cfg *config.HTTP, wg *sync.WaitGroup) *Server {
+func New(handler http.Handler, cfg *config.HTTP) *Server {
 	httpServer := &http.Server{
-    Addr:    ":" + string(cfg.Port),
+		Addr:    ":" + string(cfg.Port),
 		Handler: handler,
 	}
 
 	s := &Server{
 		server: httpServer,
-		wg:     wg,
 		notify: make(chan error, 1),
 	}
 
