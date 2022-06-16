@@ -3,21 +3,19 @@ package app
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 
 	"github.com/berkeleytrue/crypto-agg-go/config"
 	"github.com/berkeleytrue/crypto-agg-go/infra/httpserver"
+	"github.com/berkeleytrue/crypto-agg-go/internal/controllers/http/v1"
 	"github.com/gin-gonic/gin"
 )
 
 func Run(cfg *config.Config) {
-	handler := gin.Default()
-	handler.GET("/", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{"message": "hello world"})
-	})
+	handler := gin.New()
+	v1.NewRouter(handler)
 
 	s := httpserver.New(handler, &cfg.HTTP)
 
