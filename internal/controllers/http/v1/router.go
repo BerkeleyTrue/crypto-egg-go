@@ -16,8 +16,6 @@ func NewRouter(handler *gin.Engine) {
 
 	handler.GET("/ping", func(c *gin.Context) { c.JSON(http.StatusOK, gin.H{"message": "ok"}) })
 
-	h := handler.Group("/v1")
-	h.GET("/coin", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{"message": "coins"})
-	})
+	h := handler.Group("/api")
+	addCoinRoutes(h)
 }
