@@ -3,7 +3,7 @@ package base
 import (
 	"net/http"
 
-	"github.com/berkeleytrue/crypto-egg-go/internal/controllers/coin"
+	"github.com/berkeleytrue/crypto-egg-go/internal/drivers/coin"
 	"github.com/berkeleytrue/crypto-egg-go/internal/core/services"
 	"github.com/gin-gonic/gin"
 )
