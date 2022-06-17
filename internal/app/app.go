@@ -22,10 +22,11 @@ func Run(cfg *config.Config) {
 	handler := gin.New()
 	ginInfra.AddGinHandlers(handler)
 	base.NewRouter(handler, coinSrv)
+
 	api := handler.Group("/api")
 	coin.AddCoinRoutes(api, coinSrv)
 
-	s := httpserver.New(handler, &cfg.HTTP)
+	s := httpserver.New(handler, cfg.HTTP)
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGKILL)
 

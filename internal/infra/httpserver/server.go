@@ -43,7 +43,7 @@ func (s *Server) Notify() <-chan error {
 	return s.notify
 }
 
-func New(handler *gin.Engine, cfg *config.HTTP) *Server {
+func New(handler *gin.Engine, cfg config.HTTP) *Server {
 	httpServer := &http.Server{
 		Addr:    ":" + string(cfg.Port),
 		Handler: handler,
