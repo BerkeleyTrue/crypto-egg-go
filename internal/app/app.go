@@ -7,12 +7,12 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/berkeleytrue/crypto-agg-go/config"
-	"github.com/berkeleytrue/crypto-agg-go/internal/controllers/http/base"
-	"github.com/berkeleytrue/crypto-agg-go/internal/core/services"
-	ginInfra "github.com/berkeleytrue/crypto-agg-go/internal/infra/gin"
-	"github.com/berkeleytrue/crypto-agg-go/internal/infra/httpserver"
-	"github.com/berkeleytrue/crypto-agg-go/internal/repos/coinrepo"
+	"github.com/berkeleytrue/crypto-egg-go/config"
+	"github.com/berkeleytrue/crypto-egg-go/internal/controllers/http/base"
+	"github.com/berkeleytrue/crypto-egg-go/internal/core/services"
+	ginInfra "github.com/berkeleytrue/crypto-egg-go/internal/infra/gin"
+	"github.com/berkeleytrue/crypto-egg-go/internal/infra/httpserver"
+	"github.com/berkeleytrue/crypto-egg-go/internal/repos/coinrepo"
 	"github.com/gin-gonic/gin"
 )
 

@@ -3,8 +3,8 @@ package services
 import (
 	"fmt"
 
-	"github.com/berkeleytrue/crypto-agg-go/internal/core/domain"
-	"github.com/berkeleytrue/crypto-agg-go/internal/core/ports"
+	"github.com/berkeleytrue/crypto-egg-go/internal/core/domain"
+	"github.com/berkeleytrue/crypto-egg-go/internal/core/ports"
 )
 
 type CoinService struct {

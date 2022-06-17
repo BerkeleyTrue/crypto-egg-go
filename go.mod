@@ -1,4 +1,4 @@
-module github.com/berkeleytrue/crypto-agg-go
+module github.com/berkeleytrue/crypto-egg-go
 
 go 1.18
 

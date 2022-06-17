@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/berkeleytrue/crypto-agg-go/config"
+	"github.com/berkeleytrue/crypto-egg-go/config"
 	"github.com/gin-gonic/gin"
 )
 

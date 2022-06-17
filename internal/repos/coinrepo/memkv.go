@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/berkeleytrue/crypto-agg-go/internal/core/domain"
+	"github.com/berkeleytrue/crypto-egg-go/internal/core/domain"
 	"github.com/jinzhu/copier"
 )
 
