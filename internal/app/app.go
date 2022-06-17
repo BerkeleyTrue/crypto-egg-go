@@ -9,6 +9,7 @@ import (
 
 	"github.com/berkeleytrue/crypto-egg-go/config"
 	"github.com/berkeleytrue/crypto-egg-go/internal/core/services"
+	"github.com/berkeleytrue/crypto-egg-go/internal/driven/coingecko"
 	"github.com/berkeleytrue/crypto-egg-go/internal/driven/coinrepo"
 	"github.com/berkeleytrue/crypto-egg-go/internal/drivers/coin"
 	"github.com/berkeleytrue/crypto-egg-go/internal/drivers/http/base"
@@ -18,7 +19,11 @@ import (
 )
 
 func Run(cfg *config.Config) {
+	coins := []string{"ethereum"}
+
 	coinSrv := services.New(coinrepo.NewMemKVS())
+	cgSrv := services.CreateCoinGeckoSrv(coingecko.Init())
+
 	handler := gin.New()
 	ginInfra.AddGinHandlers(handler)
 	base.NewRouter(handler, coinSrv)
@@ -30,6 +35,7 @@ func Run(cfg *config.Config) {
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGKILL)
 
+	_, cgCleanup := cgSrv.StartService(coins)
 	cleanup := s.Start()
 
 	select {
@@ -40,6 +46,7 @@ func Run(cfg *config.Config) {
 		fmt.Println("quitting")
 		stop()
 		cleanup()
+		cgCleanup()
 		break
 	}
 }
