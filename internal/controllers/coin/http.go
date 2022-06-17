@@ -1,0 +1,33 @@
+package coin
+
+import (
+	"fmt"
+	"net/http"
+
+	"github.com/berkeleytrue/crypto-agg-go/internal/core/services"
+	"github.com/gin-gonic/gin"
+)
+
+func AddCoinRoutes(h *gin.RouterGroup, coinSrv *services.CoinService) {
+	h.GET("/coin", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{"message": "coins"})
+	})
+
+	h.GET("/coins/:id", func(c *gin.Context) {
+		id := c.Param("id")
+		coin, err := coinSrv.Get(id)
+
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"message": fmt.Sprint(fmt.Errorf("Couldn't satisify request: %w", err))})
+			return
+		}
+
+		if coin.ID == "" {
+			fmt.Println("not found")
+			c.JSON(http.StatusNotFound, gin.H{"message": "Not found"})
+			return
+		}
+
+		c.JSON(http.StatusOK, coin)
+	})
+}

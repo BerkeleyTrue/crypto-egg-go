@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/berkeleytrue/crypto-agg-go/config"
+	"github.com/gin-gonic/gin"
 )
 
 type Server struct {
@@ -42,7 +43,7 @@ func (s *Server) Notify() <-chan error {
 	return s.notify
 }
 
-func New(handler http.Handler, cfg *config.HTTP) *Server {
+func New(handler *gin.Engine, cfg *config.HTTP) *Server {
 	httpServer := &http.Server{
 		Addr:    ":" + string(cfg.Port),
 		Handler: handler,
