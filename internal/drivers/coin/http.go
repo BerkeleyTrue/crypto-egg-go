@@ -22,7 +22,25 @@ func AddCoinRoutes(h *gin.RouterGroup, coinSrv *services.CoinService) {
 		c.JSON(http.StatusOK, coins)
 	})
 
-	h.GET("/coins/:id", func(c *gin.Context) {
+  h.GET("/coins/sym/:sym", func(c *gin.Context) {
+    sym := c.Param("sym")
+    coin, err := coinSrv.GetBySymbol(sym)
+
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"message": fmt.Sprint(fmt.Errorf("Couldn't satisify request: %w", err))})
+			return
+		}
+
+		if coin.ID == "" {
+			fmt.Println("not found")
+			c.JSON(http.StatusNotFound, gin.H{"message": "Not found"})
+			return
+		}
+
+		c.JSON(http.StatusOK, coin)
+  })
+
+	h.GET("/coins/id/:id", func(c *gin.Context) {
 		id := c.Param("id")
 		coin, err := coinSrv.Get(id)
 
@@ -39,4 +57,5 @@ func AddCoinRoutes(h *gin.RouterGroup, coinSrv *services.CoinService) {
 
 		c.JSON(http.StatusOK, coin)
 	})
+
 }

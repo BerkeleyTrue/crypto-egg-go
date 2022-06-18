@@ -6,6 +6,7 @@ var apiUrl = "https://api.coingecko.com/api/v3/"
 
 type CoinRepo interface {
 	Get(id string) (domain.Coin, error)
+	GetBySymbol(sym string) (domain.Coin, error)
 	Update(id string, coin domain.Coin) (domain.Coin, error)
 	GetAll() ([]domain.Coin, error)
 }
