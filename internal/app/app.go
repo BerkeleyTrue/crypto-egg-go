@@ -19,7 +19,6 @@ import (
 )
 
 func Run(cfg *config.Config) {
-	ids := []string{"ethereum"}
 
 	coinSrv := services.New(coinrepo.NewMemKVS())
 	cgSrv := services.CreateCoinGeckoSrv(coingecko.Init())
@@ -35,7 +34,7 @@ func Run(cfg *config.Config) {
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGKILL)
 
-	coins, cgCleanup := cgSrv.StartService(ids)
+	coins, cgCleanup := cgSrv.StartService(cfg.Coins)
 	cleanup := s.Start()
 
 	go func() {
@@ -43,6 +42,7 @@ func Run(cfg *config.Config) {
 			select {
 			case coin := <-coins:
 				for _, coin := range coin {
+					// fmt.Printf("updating %s\n", coin.ID)
 					coinSrv.Update(coin)
 				}
 			}

@@ -13,6 +13,7 @@ type (
 
 	Config struct {
 		HTTP `yaml:"http"`
+    Coins []string `yaml:"coins"`
 	}
 )
 
