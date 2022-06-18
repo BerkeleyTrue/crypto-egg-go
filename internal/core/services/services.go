@@ -29,3 +29,7 @@ func (srv *CoinService) Get(id string) (domain.Coin, error) {
 func (srv *CoinService) Update(c domain.Coin) (domain.Coin, error) {
   return srv.repo.Update(c.ID, c)
 }
+
+func (srv *CoinService) GetAll() ([]domain.Coin, error) {
+  return srv.repo.GetAll()
+}
