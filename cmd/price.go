@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/berkeleytrue/crypto-egg-go/config"
 	"github.com/berkeleytrue/crypto-egg-go/internal/core/domain"
 	"github.com/berkeleytrue/crypto-egg-go/internal/utils/formatutil"
 	"github.com/spf13/cobra"
@@ -22,17 +21,14 @@ var priceCmd = &cobra.Command{
 	Long:  `Get the current price of a coin`,
 	Args:  cobra.MinimumNArgs(1),
 	PreRun: func(cmd *cobra.Command, args []string) {
-		if cfg := cmd.Context().Value("cfg"); cfg == nil {
-			log.Fatalf("Cmd doesn't have access to ctx: %#v", cfg)
+		if client := cmd.Context().Value("client"); client == nil {
+			log.Fatalf("Cmd doesn't have access to client: %#v", client)
 		}
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		cfg := cmd.Context().Value("cfg").(*config.Config)
+		client := cmd.Context().Value("client").(*gentleman.Client)
 		sym := args[0]
 		// fmt.Printf("price called w/ %s\n", sym)
-
-		client := gentleman.New()
-		client.URL("http://localhost:" + cfg.HTTP.Port)
 
 		request := client.Request()
 
