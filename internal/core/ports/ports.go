@@ -10,6 +10,11 @@ type CoinRepo interface {
 }
 
 type CoinGeckoApi interface {
-  Ping() (bool, error)
-  GetCoins(ids []string) ([]domain.Coin, error)
+	Ping() (bool, error)
+	GetCoins(ids []string) ([]domain.Coin, error)
+}
+
+type FlipRepo interface {
+	Get() domain.Flippening
+	Update(ratio int64)
 }

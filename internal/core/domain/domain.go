@@ -9,3 +9,7 @@ type Coin struct {
   MarketCap int64
   UpdatedAt time.Time
 }
+
+type Flippening struct {
+  Ratio int64
+}

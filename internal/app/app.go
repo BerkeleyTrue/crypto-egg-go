@@ -11,6 +11,7 @@ import (
 	"github.com/berkeleytrue/crypto-egg-go/internal/core/services"
 	"github.com/berkeleytrue/crypto-egg-go/internal/driven/coingecko"
 	"github.com/berkeleytrue/crypto-egg-go/internal/driven/coinrepo"
+	"github.com/berkeleytrue/crypto-egg-go/internal/driven/fliprepo"
 	"github.com/berkeleytrue/crypto-egg-go/internal/drivers/coin"
 	"github.com/berkeleytrue/crypto-egg-go/internal/drivers/http/base"
 	ginInfra "github.com/berkeleytrue/crypto-egg-go/internal/infra/gin"
@@ -22,6 +23,7 @@ func Run(cfg *config.Config) {
 
 	coinSrv := services.New(coinrepo.NewMemKVS())
 	cgSrv := services.CreateCoinGeckoSrv(coingecko.Init())
+  flipSrv := services.CreateFlipSrv(fliprepo.CreateFlipRepo(), *coinSrv)
 
 	handler := gin.New()
 	ginInfra.AddGinHandlers(handler)
@@ -41,9 +43,22 @@ func Run(cfg *config.Config) {
 		for {
 			select {
 			case coin := <-coins:
+				hasBTC := false
+				hasEth := false
+
 				for _, coin := range coin {
+					if coin.Symbol == "btc" {
+						hasBTC = true
+					}
+					if coin.Symbol == "eth" {
+						hasEth = true
+					}
 					// fmt.Printf("updating %s\n", coin.ID)
 					coinSrv.Update(coin)
+				}
+
+				if hasEth && hasBTC {
+					flipSrv.Update()
 				}
 			}
 		}
