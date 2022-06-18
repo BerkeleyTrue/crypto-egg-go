@@ -13,6 +13,7 @@ import (
 	"github.com/berkeleytrue/crypto-egg-go/internal/driven/coinrepo"
 	"github.com/berkeleytrue/crypto-egg-go/internal/driven/fliprepo"
 	"github.com/berkeleytrue/crypto-egg-go/internal/drivers/coin"
+	"github.com/berkeleytrue/crypto-egg-go/internal/drivers/flipdriver"
 	"github.com/berkeleytrue/crypto-egg-go/internal/drivers/http/base"
 	ginInfra "github.com/berkeleytrue/crypto-egg-go/internal/infra/gin"
 	"github.com/berkeleytrue/crypto-egg-go/internal/infra/httpserver"
@@ -31,6 +32,7 @@ func Run(cfg *config.Config) {
 
 	api := handler.Group("/api")
 	coin.AddCoinRoutes(api, coinSrv)
+	flipdriver.AddFlipRoutes(api, flipSrv)
 
 	s := httpserver.New(handler, cfg.HTTP)
 

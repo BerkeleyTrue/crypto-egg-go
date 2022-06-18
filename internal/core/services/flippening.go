@@ -7,23 +7,23 @@ import (
 	"github.com/berkeleytrue/crypto-egg-go/internal/core/ports"
 )
 
-type flipSrv struct {
+type FlipSrv struct {
 	repo    ports.FlipRepo
 	coinSrv CoinService
 }
 
-func CreateFlipSrv(repo ports.FlipRepo, coinSrv CoinService) *flipSrv {
-	return &flipSrv{
+func CreateFlipSrv(repo ports.FlipRepo, coinSrv CoinService) *FlipSrv {
+	return &FlipSrv{
 		repo,
 		coinSrv,
 	}
 }
 
-func (srv *flipSrv) Get() domain.Flippening {
+func (srv *FlipSrv) Get() domain.Flippening {
 	return srv.repo.Get()
 }
 
-func (srv *flipSrv) Update() (domain.Flippening, error) {
+func (srv *FlipSrv) Update() (domain.Flippening, error) {
 	btc, err := srv.coinSrv.Get("bitcoin")
 	if err != nil {
 		return domain.Flippening{}, fmt.Errorf("Couldn't fetch bitcoin market cap: %w", err)
