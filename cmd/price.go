@@ -42,15 +42,14 @@ var priceCmd = &cobra.Command{
 
 		if err != nil {
 			log.Fatal("Request failed: %w", err)
-			return
 		}
 
 		if !res.Ok && res.StatusCode != 404 {
 			log.Fatalf("Bad response: %d", res.StatusCode)
-			return
 		}
 		if res.StatusCode == 404 {
 			fmt.Println("0.00")
+			return
 		}
 
 		coin := domain.Coin{}
@@ -59,7 +58,25 @@ var priceCmd = &cobra.Command{
 			log.Fatal("Couldn't parse response: %w", err)
 		}
 
-		fmt.Printf("%f\n", coin.Price)
+		var format string = "%f\n"
+		switch {
+		case coin.Price < 0.0001:
+			format = "0.001\n"
+			break
+		case coin.Price < 0.01:
+			format = "%.6f\n"
+			break
+		case coin.Price < 1:
+			format = "%.4f\n"
+			break
+		case coin.Price < 100:
+			format = "%.2f\n"
+			break
+		case coin.Price < 1000:
+			format = "%.0f\n"
+		}
+
+		fmt.Printf(format, coin.Price)
 	},
 }
 
