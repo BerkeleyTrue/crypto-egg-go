@@ -25,3 +25,7 @@ func (srv *CoinService) Get(id string) (domain.Coin, error) {
 
 	return coin, nil
 }
+
+func (srv *CoinService) Update(c domain.Coin) (domain.Coin, error) {
+  return srv.repo.Update(c.ID, c)
+}
