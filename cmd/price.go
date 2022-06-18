@@ -10,6 +10,7 @@ import (
 
 	"github.com/berkeleytrue/crypto-egg-go/config"
 	"github.com/berkeleytrue/crypto-egg-go/internal/core/domain"
+	"github.com/berkeleytrue/crypto-egg-go/internal/utils/formatutil"
 	"github.com/spf13/cobra"
 	"gopkg.in/h2non/gentleman.v2"
 )
@@ -58,25 +59,7 @@ var priceCmd = &cobra.Command{
 			log.Fatal("Couldn't parse response: %w", err)
 		}
 
-		var format string = "%f\n"
-		switch {
-		case coin.Price < 0.0001:
-			format = "0.001\n"
-			break
-		case coin.Price < 0.01:
-			format = "%.6f\n"
-			break
-		case coin.Price < 1:
-			format = "%.4f\n"
-			break
-		case coin.Price < 100:
-			format = "%.2f\n"
-			break
-		case coin.Price < 1000:
-			format = "%.0f\n"
-		}
-
-		fmt.Printf(format, coin.Price)
+		formatutil.PrintPrice(coin.Price)
 	},
 }
 
