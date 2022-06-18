@@ -16,5 +16,5 @@ type CoinGeckoApi interface {
 
 type FlipRepo interface {
 	Get() domain.Flippening
-	Update(ratio int64)
+	Update(ratio float64, btcCap int64, ethCap int64)
 }

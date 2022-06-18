@@ -42,8 +42,8 @@ func (srv *FlipSrv) Update() (domain.Flippening, error) {
 	if eth.MarketCap == 0 {
 		return domain.Flippening{}, fmt.Errorf("No ethereum market cap returned")
 	}
-	ratio := btc.MarketCap / eth.MarketCap
+	var ratio float64 = float64(eth.MarketCap) / float64(btc.MarketCap)
 
-	srv.repo.Update(ratio)
+	srv.repo.Update(ratio, eth.MarketCap, btc.MarketCap)
 	return srv.repo.Get(), nil
 }

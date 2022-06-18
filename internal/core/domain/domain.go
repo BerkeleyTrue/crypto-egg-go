@@ -11,5 +11,9 @@ type Coin struct {
 }
 
 type Flippening struct {
-  Ratio int64
+  Ratio float64
+  EthCap int64
+  BtcCap int64
+  Init bool
+  UpdatedAt time.Time
 }
