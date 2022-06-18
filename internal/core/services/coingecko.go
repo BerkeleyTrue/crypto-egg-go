@@ -17,22 +17,34 @@ func CreateCoinGeckoSrv(repo ports.CoinGeckoApi) *CoinGeckoService {
 }
 
 func (srv *CoinGeckoService) StartService(ids []string) (chan []domain.Coin, func()) {
-  coins := make(chan []domain.Coin)
+	coins := make(chan []domain.Coin, 1)
 
 	ticker := time.NewTicker(5 * time.Second)
 	quitTickerChan := make(chan struct{})
 
 	go func() {
+		var isPingOk bool = false
 		for {
 			select {
 			case <-ticker.C:
-				ok, err := srv.repo.Ping()
-				if err != nil {
-					fmt.Println(fmt.Errorf("Ping err: %w", err))
-				} else if !ok {
-					fmt.Println("ping not ok")
+				if isPingOk {
+					res, err := srv.repo.GetCoins(ids)
+					if err != nil || res == nil {
+						fmt.Println(fmt.Errorf("GetCoins err: %w", err))
+						isPingOk = false
+					} else {
+						coins <- res
+					}
 				} else {
-					fmt.Println("ping Ok")
+					ok, err := srv.repo.Ping()
+					if err != nil {
+						fmt.Println(fmt.Errorf("Ping err: %w", err))
+					} else if !ok {
+						fmt.Println("ping not ok")
+					} else {
+						fmt.Println("ping Ok")
+						isPingOk = true
+					}
 				}
 			case <-quitTickerChan:
 				ticker.Stop()
@@ -44,6 +56,6 @@ func (srv *CoinGeckoService) StartService(ids []string) (chan []domain.Coin, fun
 	return coins, func() {
 		quitTickerChan <- struct{}{}
 		close(quitTickerChan)
-	  close(coins)
+		close(coins)
 	}
 }

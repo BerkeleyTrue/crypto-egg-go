@@ -1,15 +1,15 @@
 package coingecko
 
 import (
-	"encoding/json"
 	"fmt"
-	"net/http"
+	"strings"
+	"time"
 
 	"github.com/berkeleytrue/crypto-egg-go/internal/core/domain"
+	"github.com/jinzhu/copier"
 	"gopkg.in/eapache/go-resiliency.v1/retrier"
 	retry "gopkg.in/h2non/gentleman-retry.v2"
 	"gopkg.in/h2non/gentleman.v2"
-	"gopkg.in/h2non/gentleman.v2/plugins/body"
 )
 
 var apiUrl = "https://api.coingecko.com/api/v3/"
@@ -19,10 +19,14 @@ type CGClient struct {
 }
 
 type jsonData struct {
-	URL     string            `json:"url"`
-	Origin  string            `json:"origin"`
-	Headers map[string]string `json:"headers"`
+	ID        string `json:"id"`
+	Symbol    string
+	Name      string
+	Price     float32 `json:"current_price"`
+	MarketCap int64   `json:"market_cap"`
 }
+
+type jsonRes []jsonData
 
 func Init() CGClient {
 	client := gentleman.New()
@@ -34,34 +38,51 @@ func Init() CGClient {
 
 func (c CGClient) Ping() (bool, error) {
 	res, err := c.client.
-		Path("/ping").
-		Use(retry.New(retrier.New(retrier.ExponentialBackoff(100, 2000), nil))).
 		Request().
+		AddPath("ping").
+		Use(retry.New(retrier.New(retrier.ExponentialBackoff(100, 2000), nil))).
 		Send()
 
 	if err != nil {
 		return false, fmt.Errorf("Error making request: %w", err)
 	}
+	if !res.Ok {
+		fmt.Printf("ping not ok error: %d\n", res.StatusCode)
+	}
 	return res.Ok, nil
 }
 
-func (c CGClient) GetCoins(coins []string) ([]domain.Coin, error) {
-	data, err := json.Marshal(coins)
-	if err != nil {
-		return nil, fmt.Errorf("Couldn't encode json: %w", err)
-	}
+func (c CGClient) GetCoins(ids []string) ([]domain.Coin, error) {
+	request := c.client.
+		Request().
+		AddPath("coins/markets").
+		SetQuery("vs_currency", "usd").
+		SetQuery("ids", strings.Join(ids, ", "))
 
-	res, err := c.client.Path("/coins/markets").Method(http.MethodPost).Request().Use(body.JSON(data)).Send()
+	res, err := request.Send()
 	if err != nil {
 		return nil, fmt.Errorf("Couldn't complete request: %w", err)
 	}
 	if !res.Ok {
-		return nil, fmt.Errorf("Invalid response from server: %w", err)
+		return nil, fmt.Errorf("Invalid response from server: %d", res.StatusCode)
 	}
 
-	json := &jsonData{}
-	res.JSON(&json)
-	fmt.Printf("body: %#v\n", json)
-	// TODO translate response to coins
-	return nil, nil
+	json := jsonRes{}
+	err = res.JSON(&json)
+	if err != nil {
+		return nil, fmt.Errorf("Couldn't decode response: %w", err)
+	}
+
+  numOfRes := len(json)
+	coins := make([]domain.Coin, numOfRes)
+
+	if numOfRes >= 1 {
+		for idx, item := range json {
+			coin := domain.Coin{UpdatedAt: time.Now()}
+			copier.Copy(&coin, &item)
+			coins[idx] = coin
+		}
+	}
+
+	return coins, nil
 }
