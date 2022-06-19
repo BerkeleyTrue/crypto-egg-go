@@ -27,5 +27,5 @@ type GasRepo interface {
 }
 
 type GasApi interface {
-  Get() (float32, float32, error)
+  Get() (float32, error)
 }

@@ -24,9 +24,11 @@ func (repo *MemStore) Get() domain.Gas {
 
 func (repo *MemStore) Update(update domain.Gas) domain.Gas {
 	if gas, ok := repo.symToGas["eth"]; ok {
-	  copier.Copy(&gas, &update)
-	  return gas
+		copier.Copy(&gas, &update)
+		repo.symToGas["eth"] = gas
+		return gas
+	} else {
+		repo.symToGas["eth"] = update
+		return update
 	}
-
-	return domain.Gas{}
 }

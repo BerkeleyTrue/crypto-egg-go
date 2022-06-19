@@ -21,6 +21,5 @@ type Flippening struct {
 type Gas struct {
   ID string
   Base float32
-  AvgTime float32
   UpdatedAt time.Time
 }
