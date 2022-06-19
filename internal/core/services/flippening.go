@@ -2,10 +2,10 @@ package services
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/berkeleytrue/crypto-egg-go/internal/core/domain"
 	"github.com/berkeleytrue/crypto-egg-go/internal/core/ports"
+	"go.uber.org/zap"
 )
 
 type FlipSrv struct {
@@ -50,10 +50,13 @@ func (srv *FlipSrv) Update() (domain.Flippening, error) {
 }
 
 func (srv *FlipSrv) StartService(coinsStream chan []domain.Coin) func() {
+	logger := zap.NewExample().Sugar()
+	defer logger.Sync()
+
 	go func() {
 		select {
 		case coins := <-coinsStream:
-			log.Print("coin updated")
+			logger.Info("coin updated")
 			hasBtc := false
 			hasEth := false
 
@@ -64,14 +67,12 @@ func (srv *FlipSrv) StartService(coinsStream chan []domain.Coin) func() {
 				if coin.Symbol == "eth" {
 					hasEth = true
 				}
-				log.Printf("sym: %s", coin.Symbol)
 			}
 
-			log.Printf("hasEth: %t, hasBtc: %t", hasEth, hasBtc)
 			if hasBtc && hasEth {
 				srv.Update()
 			} else {
-				log.Print("No btc or eth found")
+				logger.Info("No btc or eth found")
 			}
 		}
 	}()

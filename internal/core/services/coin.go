@@ -1,11 +1,11 @@
 package services
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/berkeleytrue/crypto-egg-go/internal/core/domain"
 	"github.com/berkeleytrue/crypto-egg-go/internal/core/ports"
+	"go.uber.org/zap"
 )
 
 type CoinService struct {
@@ -37,7 +37,10 @@ func (srv *CoinService) GetAll() ([]domain.Coin, error) {
 }
 
 func (srv *CoinService) StartService(ids []string) (chan []domain.Coin, func()) {
-  coinsStream := make(chan []domain.Coin, 1)
+	logger := zap.NewExample().Sugar()
+	defer logger.Sync()
+
+	coinsStream := make(chan []domain.Coin, 1)
 	ticker := time.NewTicker(5 * time.Second)
 	quitTickerChan := make(chan struct{})
 
@@ -49,22 +52,22 @@ func (srv *CoinService) StartService(ids []string) (chan []domain.Coin, func()) 
 				if isPingOk {
 					coins, err := srv.api.GetCoins(ids)
 					if err != nil || coins == nil {
-						fmt.Println(fmt.Errorf("GetCoins err: %w", err))
+						logger.Error("GetCoins err: %w", "err", err)
 						isPingOk = false
 					} else {
 						for _, coin := range coins {
 							srv.Update(coin)
 						}
-					  coinsStream <- coins
+						coinsStream <- coins
 					}
 				} else {
 					ok, err := srv.api.Ping()
 					if err != nil {
-						fmt.Println(fmt.Errorf("Ping err: %w", err))
+						logger.Error("Ping err: %w", "err", err)
 					} else if !ok {
-						fmt.Println("ping not ok")
+						logger.Info("ping not ok")
 					} else {
-						fmt.Println("ping Ok")
+						logger.Info("ping Ok")
 						isPingOk = true
 					}
 				}

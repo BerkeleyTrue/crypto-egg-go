@@ -6,6 +6,7 @@ import (
 
 	"github.com/berkeleytrue/crypto-egg-go/internal/core/domain"
 	"github.com/berkeleytrue/crypto-egg-go/internal/core/ports"
+	"go.uber.org/zap"
 )
 
 type GasSrv struct {
@@ -30,6 +31,9 @@ func (srv *GasSrv) Update(baseFee float32) domain.Gas {
 }
 
 func (srv *GasSrv) StartService() func() {
+  logger := zap.NewExample().Sugar()
+  defer logger.Sync()
+
 	ticker := time.NewTicker(6 * time.Second)
 	quitTickerChan := make(chan struct{}, 1)
 

@@ -7,6 +7,7 @@ import (
 
 	"github.com/berkeleytrue/crypto-egg-go/internal/core/domain"
 	"github.com/jinzhu/copier"
+	"go.uber.org/zap"
 	"gopkg.in/eapache/go-resiliency.v1/retrier"
 	retry "gopkg.in/h2non/gentleman-retry.v2"
 	"gopkg.in/h2non/gentleman.v2"
@@ -16,6 +17,7 @@ var apiUrl = "https://api.coingecko.com/api/v3/"
 
 type CGClient struct {
 	client *gentleman.Client
+	logger *zap.SugaredLogger
 }
 
 type jsonData struct {
@@ -29,10 +31,13 @@ type jsonData struct {
 type jsonRes []jsonData
 
 func Init() CGClient {
+	logger := zap.NewExample().Sugar()
+
 	client := gentleman.New()
 	client.URL(apiUrl)
 	return CGClient{
 		client,
+		logger,
 	}
 }
 
@@ -47,7 +52,7 @@ func (c CGClient) Ping() (bool, error) {
 		return false, fmt.Errorf("Error making request: %w", err)
 	}
 	if !res.Ok {
-		fmt.Printf("ping not ok error: %d\n", res.StatusCode)
+		c.logger.Info("ping not ok error", "statusCode", res.StatusCode)
 	}
 	return res.Ok, nil
 }
@@ -73,7 +78,7 @@ func (c CGClient) GetCoins(ids []string) ([]domain.Coin, error) {
 		return nil, fmt.Errorf("Couldn't decode response: %w", err)
 	}
 
-  numOfRes := len(json)
+	numOfRes := len(json)
 	coins := make([]domain.Coin, numOfRes)
 
 	if numOfRes >= 1 {

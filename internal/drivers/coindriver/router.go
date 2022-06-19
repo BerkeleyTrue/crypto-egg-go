@@ -6,9 +6,13 @@ import (
 
 	"github.com/berkeleytrue/crypto-egg-go/internal/core/services"
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 func AddCoinRoutes(h *gin.RouterGroup, coinSrv *services.CoinService) {
+	logger := zap.NewExample().Sugar()
+	defer logger.Sync()
+
 	h.GET("/coin", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"message": "coins"})
 	})
@@ -32,7 +36,7 @@ func AddCoinRoutes(h *gin.RouterGroup, coinSrv *services.CoinService) {
 		}
 
 		if coin.ID == "" {
-			fmt.Println("not found")
+			logger.Debug("not found")
 			c.JSON(http.StatusNotFound, gin.H{"message": "Not found"})
 			return
 		}
@@ -50,7 +54,7 @@ func AddCoinRoutes(h *gin.RouterGroup, coinSrv *services.CoinService) {
 		}
 
 		if coin.ID == "" {
-			fmt.Println("not found")
+			logger.Debug("not found")
 			c.JSON(http.StatusNotFound, gin.H{"message": "Not found"})
 			return
 		}

@@ -2,7 +2,6 @@ package app
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
@@ -21,9 +20,12 @@ import (
 	ginInfra "github.com/berkeleytrue/crypto-egg-go/internal/infra/gin"
 	"github.com/berkeleytrue/crypto-egg-go/internal/infra/httpserver"
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 func Run(cfg *config.Config) {
+  logger := zap.NewExample().Sugar()
+  defer logger.Sync()
 
 	coinSrv := services.CreateCoinSrv(coinrepo.NewMemKVS(), coingecko.Init())
 	flipSrv := services.CreateFlipSrv(fliprepo.CreateFlipRepo(), *coinSrv)
@@ -49,10 +51,10 @@ func Run(cfg *config.Config) {
 
 	select {
 	case err := <-s.Notify():
-		fmt.Println(fmt.Errorf("app:Run:server: %w", err))
+		logger.Errorf("app:Run:server: %w", err)
 
 	case <-ctx.Done():
-		fmt.Println("quitting")
+		logger.Info("quitting")
 		stop()
 		cleanupCoin()
 		cleanupGas()

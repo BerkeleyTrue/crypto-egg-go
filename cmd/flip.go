@@ -6,10 +6,10 @@ package cmd
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/berkeleytrue/crypto-egg-go/internal/core/domain"
 	"github.com/spf13/cobra"
+	"go.uber.org/zap"
 	"gopkg.in/h2non/gentleman.v2"
 )
 
@@ -19,6 +19,8 @@ var flipCmd = &cobra.Command{
 	Short: "Get the current flippening ratio",
 	Long:  `Get the current flippening ratio of Ethereum to Bitcoin by marketCap`,
 	Run: func(cmd *cobra.Command, args []string) {
+		logger := zap.NewExample().Sugar()
+		defer logger.Sync()
 		client := cmd.Context().Value("client").(*gentleman.Client)
 
 		request := client.Request()
@@ -28,11 +30,11 @@ var flipCmd = &cobra.Command{
 		res, err := request.Send()
 
 		if err != nil {
-			log.Fatal("Request failed: %w", err)
+			logger.Fatal("Request failed: %w", err)
 		}
 
 		if !res.Ok && res.StatusCode != 404 {
-			log.Fatalf("Bad response: %d", res.StatusCode)
+			logger.Fatalf("Bad response: %d", res.StatusCode)
 		}
 		if res.StatusCode == 404 {
 			fmt.Println("0")
@@ -42,7 +44,7 @@ var flipCmd = &cobra.Command{
 		flip := domain.Flippening{}
 		err = res.JSON(&flip)
 		if err != nil {
-			log.Fatal("Couldn't parse response: %w", err)
+			logger.Fatal("Couldn't parse response: %w", err)
 		}
 
 		fmt.Printf("%.2f\n", flip.Ratio)

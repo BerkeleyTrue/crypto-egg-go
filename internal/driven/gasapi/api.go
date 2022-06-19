@@ -6,6 +6,7 @@ import (
 
 	"encoding/json"
 
+	"go.uber.org/zap"
 	"gopkg.in/h2non/gentleman.v2"
 )
 
@@ -37,6 +38,9 @@ func CreateGasApi() *gasApi {
 }
 
 func (api *gasApi) Get() (float32, error) {
+	logger := zap.NewExample().Sugar()
+	defer logger.Sync()
+
 	request := api.client.
 		Request()
 
@@ -46,7 +50,6 @@ func (api *gasApi) Get() (float32, error) {
 		return 0, err
 	}
 
-	// fmt.Printf("%#v\n", res.String())
 	jsonRes := jsonRes{}
 	err = res.JSON(&jsonRes)
 	var result interface{}
@@ -54,7 +57,7 @@ func (api *gasApi) Get() (float32, error) {
 	if err != nil {
 		return 0, err
 	}
-	// fmt.Printf("%#v\n", jsonRes)
+  // logger.Debug("json result", "result", jsonRes)
 	if jsonRes.Status == "0" {
 		result = new(resultString)
 	} else {
