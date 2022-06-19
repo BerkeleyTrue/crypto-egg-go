@@ -2,6 +2,7 @@ package services
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/berkeleytrue/crypto-egg-go/internal/core/domain"
 	"github.com/berkeleytrue/crypto-egg-go/internal/core/ports"
@@ -46,4 +47,33 @@ func (srv *FlipSrv) Update() (domain.Flippening, error) {
 
 	srv.repo.Update(ratio, eth.MarketCap, btc.MarketCap)
 	return srv.repo.Get(), nil
+}
+
+func (srv *FlipSrv) StartService(coinsStream chan []domain.Coin) func() {
+	go func() {
+		select {
+		case coins := <-coinsStream:
+			log.Print("coin updated")
+			hasBtc := false
+			hasEth := false
+
+			for _, coin := range coins {
+				if coin.Symbol == "btc" {
+					hasBtc = true
+				}
+				if coin.Symbol == "eth" {
+					hasEth = true
+				}
+				log.Printf("sym: %s", coin.Symbol)
+			}
+
+			log.Printf("hasEth: %t, hasBtc: %t", hasEth, hasBtc)
+			if hasBtc && hasEth {
+				srv.Update()
+			} else {
+				log.Print("No btc or eth found")
+			}
+		}
+	}()
+	return func() {}
 }

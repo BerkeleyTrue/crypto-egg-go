@@ -14,10 +14,10 @@ import (
 	"github.com/berkeleytrue/crypto-egg-go/internal/driven/fliprepo"
 	"github.com/berkeleytrue/crypto-egg-go/internal/driven/gasapi"
 	"github.com/berkeleytrue/crypto-egg-go/internal/driven/gasrepo"
+	"github.com/berkeleytrue/crypto-egg-go/internal/drivers/basedriver"
 	"github.com/berkeleytrue/crypto-egg-go/internal/drivers/coindriver"
 	"github.com/berkeleytrue/crypto-egg-go/internal/drivers/flipdriver"
 	"github.com/berkeleytrue/crypto-egg-go/internal/drivers/gasdriver"
-	"github.com/berkeleytrue/crypto-egg-go/internal/drivers/basedriver"
 	ginInfra "github.com/berkeleytrue/crypto-egg-go/internal/infra/gin"
 	"github.com/berkeleytrue/crypto-egg-go/internal/infra/httpserver"
 	"github.com/gin-gonic/gin"
@@ -25,8 +25,7 @@ import (
 
 func Run(cfg *config.Config) {
 
-	coinSrv := services.New(coinrepo.NewMemKVS())
-	cgSrv := services.CreateCoinGeckoSrv(coingecko.Init())
+	coinSrv := services.CreateCoinSrv(coinrepo.NewMemKVS(), coingecko.Init())
 	flipSrv := services.CreateFlipSrv(fliprepo.CreateFlipRepo(), *coinSrv)
 	gasSrv := services.CreateGasSrv(gasrepo.CreateMemRepo(), gasapi.CreateGasApi())
 
@@ -43,34 +42,10 @@ func Run(cfg *config.Config) {
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGKILL)
 
-	coins, cgCleanup := cgSrv.StartService(cfg.Coins)
+	coinStream, cleanupCoin := coinSrv.StartService(cfg.Coins)
+	flipSrv.StartService(coinStream)
 	cleanupGas := gasSrv.StartService()
 	cleanup := s.Start()
-
-	go func() {
-		for {
-			select {
-			case coin := <-coins:
-				hasBTC := false
-				hasEth := false
-
-				for _, coin := range coin {
-					if coin.Symbol == "btc" {
-						hasBTC = true
-					}
-					if coin.Symbol == "eth" {
-						hasEth = true
-					}
-					// fmt.Printf("updating %s\n", coin.ID)
-					coinSrv.Update(coin)
-				}
-
-				if hasEth && hasBTC {
-					flipSrv.Update()
-				}
-			}
-		}
-	}()
 
 	select {
 	case err := <-s.Notify():
@@ -79,8 +54,8 @@ func Run(cfg *config.Config) {
 	case <-ctx.Done():
 		fmt.Println("quitting")
 		stop()
+		cleanupCoin()
 		cleanupGas()
-		cgCleanup()
 		cleanup()
 		break
 	}
