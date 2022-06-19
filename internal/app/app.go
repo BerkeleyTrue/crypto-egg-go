@@ -12,6 +12,8 @@ import (
 	"github.com/berkeleytrue/crypto-egg-go/internal/driven/coingecko"
 	"github.com/berkeleytrue/crypto-egg-go/internal/driven/coinrepo"
 	"github.com/berkeleytrue/crypto-egg-go/internal/driven/fliprepo"
+	"github.com/berkeleytrue/crypto-egg-go/internal/driven/gasapi"
+	"github.com/berkeleytrue/crypto-egg-go/internal/driven/gasrepo"
 	"github.com/berkeleytrue/crypto-egg-go/internal/drivers/coin"
 	"github.com/berkeleytrue/crypto-egg-go/internal/drivers/flipdriver"
 	"github.com/berkeleytrue/crypto-egg-go/internal/drivers/http/base"
@@ -24,7 +26,8 @@ func Run(cfg *config.Config) {
 
 	coinSrv := services.New(coinrepo.NewMemKVS())
 	cgSrv := services.CreateCoinGeckoSrv(coingecko.Init())
-  flipSrv := services.CreateFlipSrv(fliprepo.CreateFlipRepo(), *coinSrv)
+	flipSrv := services.CreateFlipSrv(fliprepo.CreateFlipRepo(), *coinSrv)
+	gasSrv := services.CreateGasSrv(gasrepo.CreateMemRepo(), gasapi.CreateGasApi())
 
 	handler := gin.New()
 	ginInfra.AddGinHandlers(handler)
@@ -39,6 +42,7 @@ func Run(cfg *config.Config) {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGKILL)
 
 	coins, cgCleanup := cgSrv.StartService(cfg.Coins)
+	cleanupGas := gasSrv.StartService()
 	cleanup := s.Start()
 
 	go func() {
@@ -73,8 +77,9 @@ func Run(cfg *config.Config) {
 	case <-ctx.Done():
 		fmt.Println("quitting")
 		stop()
-		cleanup()
+		cleanupGas()
 		cgCleanup()
+		cleanup()
 		break
 	}
 }

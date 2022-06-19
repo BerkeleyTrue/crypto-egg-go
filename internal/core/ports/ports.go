@@ -20,3 +20,12 @@ type FlipRepo interface {
 	Get() domain.Flippening
 	Update(ratio float64, btcCap int64, ethCap int64)
 }
+
+type GasRepo interface {
+	Get() domain.Gas
+	Update(update domain.Gas) domain.Gas
+}
+
+type GasApi interface {
+  Get() (float32, float32, error)
+}
