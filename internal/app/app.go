@@ -14,10 +14,10 @@ import (
 	"github.com/berkeleytrue/crypto-egg-go/internal/driven/fliprepo"
 	"github.com/berkeleytrue/crypto-egg-go/internal/driven/gasapi"
 	"github.com/berkeleytrue/crypto-egg-go/internal/driven/gasrepo"
-	"github.com/berkeleytrue/crypto-egg-go/internal/drivers/coin"
+	"github.com/berkeleytrue/crypto-egg-go/internal/drivers/coindriver"
 	"github.com/berkeleytrue/crypto-egg-go/internal/drivers/flipdriver"
 	"github.com/berkeleytrue/crypto-egg-go/internal/drivers/gasdriver"
-	"github.com/berkeleytrue/crypto-egg-go/internal/drivers/http/base"
+	"github.com/berkeleytrue/crypto-egg-go/internal/drivers/basedriver"
 	ginInfra "github.com/berkeleytrue/crypto-egg-go/internal/infra/gin"
 	"github.com/berkeleytrue/crypto-egg-go/internal/infra/httpserver"
 	"github.com/gin-gonic/gin"
@@ -32,10 +32,10 @@ func Run(cfg *config.Config) {
 
 	handler := gin.New()
 	ginInfra.AddGinHandlers(handler)
-	base.NewRouter(handler, coinSrv)
+	basedriver.NewRouter(handler, coinSrv)
 
 	api := handler.Group("/api")
-	coin.AddCoinRoutes(api, coinSrv)
+	coindriver.AddCoinRoutes(api, coinSrv)
 	flipdriver.AddFlipRoutes(api, flipSrv)
 	gasdriver.AddGasRoutes(api, gasSrv)
 
