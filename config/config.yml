@@ -1,7 +1,4 @@
 ---
-http:
-  port: "8000"
-
 coins:
   - ethereum
   - bitcoin

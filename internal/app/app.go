@@ -24,12 +24,16 @@ import (
 )
 
 func Run(cfg *config.Config) {
-  logger := zap.NewExample().Sugar()
-  defer logger.Sync()
+	logger := zap.NewExample().Sugar()
+	defer logger.Sync()
 
 	coinSrv := services.CreateCoinSrv(coinrepo.NewMemKVS(), coingecko.Init())
 	flipSrv := services.CreateFlipSrv(fliprepo.CreateFlipRepo(), *coinSrv)
 	gasSrv := services.CreateGasSrv(gasrepo.CreateMemRepo(), gasapi.CreateGasApi())
+
+	if cfg.HTTP.GinReleaseMode {
+		gin.SetMode(gin.ReleaseMode)
+	}
 
 	handler := gin.New()
 	ginInfra.AddGinHandlers(handler)
