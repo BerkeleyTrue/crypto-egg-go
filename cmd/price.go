@@ -8,7 +8,7 @@ import (
 	"fmt"
 
 	"github.com/berkeleytrue/crypto-egg-go/internal/core/domain"
-	"github.com/berkeleytrue/crypto-egg-go/internal/utils/formatutil"
+	"github.com/berkeleytrue/crypto-egg-go/internal/utils"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
 	"gopkg.in/h2non/gentleman.v2"
@@ -61,7 +61,7 @@ var priceCmd = &cobra.Command{
 			logger.Fatalf("Couldn't parse response: %w", err)
 		}
 
-		formatutil.PrintPrice(coin.Price)
+		utils.Formatter.PrintPrice(coin.Price)
 	},
 }
 
