@@ -7,8 +7,8 @@ import (
 )
 
 func main() {
-  logger := zap.NewExample().Sugar()
-  defer logger.Sync()
+	logger := zap.NewExample().Sugar()
+	defer logger.Sync()
 
 	cfg, err := config.NewConfig()
 
