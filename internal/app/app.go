@@ -19,7 +19,6 @@ import (
 	"github.com/berkeleytrue/crypto-egg-go/internal/drivers/gasdriver"
 	ginInfra "github.com/berkeleytrue/crypto-egg-go/internal/infra/gin"
 	"github.com/berkeleytrue/crypto-egg-go/internal/infra/httpserver"
-	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
 
@@ -31,12 +30,7 @@ func Run(cfg *config.Config) {
 	flipSrv := services.CreateFlipSrv(fliprepo.CreateFlipRepo(), *coinSrv)
 	gasSrv := services.CreateGasSrv(gasrepo.CreateMemRepo(), gasapi.CreateGasApi())
 
-	if cfg.Release != "production" {
-		gin.SetMode(gin.ReleaseMode)
-	}
-
-	handler := gin.New()
-	ginInfra.AddGinHandlers(handler, cfg)
+	handler := ginInfra.CreateGinHandler(cfg)
 	basedriver.NewRouter(handler, coinSrv)
 
 	api := handler.Group("/api")
@@ -60,9 +54,9 @@ func Run(cfg *config.Config) {
 	case <-ctx.Done():
 		logger.Info("quitting")
 		stop()
+		cleanup()
 		cleanupCoin()
 		cleanupGas()
-		cleanup()
 		break
 	}
 }

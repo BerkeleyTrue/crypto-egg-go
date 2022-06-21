@@ -42,7 +42,7 @@ func (srv *CoinService) StartService(ids []string) (chan []domain.Coin, func()) 
 
 	coinsStream := make(chan []domain.Coin, 1)
 	ticker := time.NewTicker(5 * time.Second)
-	quitTickerChan := make(chan struct{})
+	quitTickerChan := make(chan struct{}, 1)
 
 	go func() {
 		var isPingOk bool = false
