@@ -26,7 +26,6 @@ func Execute(cfg *config.Config) {
   ` + CmdName + ` gas [sym] => returns the current price of [sym]
   ` + CmdName + ` flip => returns the current marketcap of Ethereum against Bitcoin
 
-    Version: ` + cfg.Version + `
     Hash: ` + cfg.Hash + `
     Build Time: ` + cfg.Time + `
     Build User: ` + cfg.User + `

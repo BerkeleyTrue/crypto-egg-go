@@ -1,8 +1,16 @@
 package gin
 
-import "github.com/gin-gonic/gin"
+import (
+	"fmt"
 
-func AddGinHandlers(h *gin.Engine) {
-	h.Use(gin.Logger())
+	"github.com/berkeleytrue/crypto-egg-go/config"
+	"github.com/gin-gonic/gin"
+)
+
+func AddGinHandlers(h *gin.Engine, cfg *config.Config) {
+	if cfg.Release != "production" {
+	  fmt.Println("adding logger")
+    h.Use(gin.Logger())
+	}
 	h.Use(gin.Recovery())
 }

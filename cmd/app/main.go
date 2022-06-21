@@ -18,10 +18,10 @@ func main() {
 		logger.Fatal(err)
 	}
 
-	log.Printf("Version: %s", cfg.Version)
 	log.Printf("Hash: %s", cfg.Hash)
 	log.Printf("Build User: %s", cfg.User)
 	log.Printf("Build Time: %s", cfg.Time)
+  log.Printf("Release: %s", cfg.Release)
 
 	app.Run(cfg)
 }

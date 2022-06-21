@@ -31,12 +31,12 @@ func Run(cfg *config.Config) {
 	flipSrv := services.CreateFlipSrv(fliprepo.CreateFlipRepo(), *coinSrv)
 	gasSrv := services.CreateGasSrv(gasrepo.CreateMemRepo(), gasapi.CreateGasApi())
 
-	if cfg.HTTP.GinReleaseMode {
+	if cfg.Release != "production" {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
 	handler := gin.New()
-	ginInfra.AddGinHandlers(handler)
+	ginInfra.AddGinHandlers(handler, cfg)
 	basedriver.NewRouter(handler, coinSrv)
 
 	api := handler.Group("/api")
