@@ -54,25 +54,27 @@ func (srv *FlipSrv) StartService(coinsStream chan []domain.Coin) func() {
 	defer logger.Sync()
 
 	go func() {
-		select {
-		case coins := <-coinsStream:
-			logger.Info("coin updated")
-			hasBtc := false
-			hasEth := false
+		for {
+			select {
+			case coins := <-coinsStream:
+				logger.Info("coin updated")
+				hasBtc := false
+				hasEth := false
 
-			for _, coin := range coins {
-				if coin.Symbol == "btc" {
-					hasBtc = true
+				for _, coin := range coins {
+					if coin.Symbol == "btc" {
+						hasBtc = true
+					}
+					if coin.Symbol == "eth" {
+						hasEth = true
+					}
 				}
-				if coin.Symbol == "eth" {
-					hasEth = true
-				}
-			}
 
-			if hasBtc && hasEth {
-				srv.Update()
-			} else {
-				logger.Info("No btc or eth found")
+				if hasBtc && hasEth {
+					srv.Update()
+				} else {
+					logger.Info("No btc or eth found")
+				}
 			}
 		}
 	}()
