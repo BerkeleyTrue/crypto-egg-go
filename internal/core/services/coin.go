@@ -20,19 +20,19 @@ func CreateCoinSrv(repo ports.CoinRepo, api ports.CoinGeckoApi) *CoinService {
 	}
 }
 
-func (srv *CoinService) Get(id string) (domain.Coin, error) {
+func (srv *CoinService) Get(id string) domain.Coin {
 	return srv.repo.Get(id)
 }
 
-func (srv *CoinService) GetBySymbol(sym string) (domain.Coin, error) {
+func (srv *CoinService) GetBySymbol(sym string) domain.Coin {
 	return srv.repo.GetBySymbol(sym)
 }
 
-func (srv *CoinService) Update(c domain.Coin) (domain.Coin, error) {
+func (srv *CoinService) Update(c domain.Coin) domain.Coin {
 	return srv.repo.Update(c.ID, c)
 }
 
-func (srv *CoinService) GetAll() ([]domain.Coin, error) {
+func (srv *CoinService) GetAll() []domain.Coin {
 	return srv.repo.GetAll()
 }
 

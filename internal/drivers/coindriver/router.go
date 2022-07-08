@@ -1,7 +1,6 @@
 package coindriver
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/berkeleytrue/crypto-egg-go/internal/core/services"
@@ -18,22 +17,13 @@ func AddCoinRoutes(h *gin.RouterGroup, coinSrv *services.CoinService) {
 	})
 
 	h.GET("/coins", func(c *gin.Context) {
-		coins, err := coinSrv.GetAll()
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"message": fmt.Sprint(fmt.Errorf("Couldn't satisify request: %w", err))})
-			return
-		}
+		coins := coinSrv.GetAll()
 		c.JSON(http.StatusOK, coins)
 	})
 
-  h.GET("/coins/sym/:sym", func(c *gin.Context) {
-    sym := c.Param("sym")
-    coin, err := coinSrv.GetBySymbol(sym)
-
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"message": fmt.Sprint(fmt.Errorf("Couldn't satisify request: %w", err))})
-			return
-		}
+	h.GET("/coins/sym/:sym", func(c *gin.Context) {
+		sym := c.Param("sym")
+		coin := coinSrv.GetBySymbol(sym)
 
 		if coin.ID == "" {
 			logger.Debug("not found")
@@ -42,16 +32,11 @@ func AddCoinRoutes(h *gin.RouterGroup, coinSrv *services.CoinService) {
 		}
 
 		c.JSON(http.StatusOK, coin)
-  })
+	})
 
 	h.GET("/coins/id/:id", func(c *gin.Context) {
 		id := c.Param("id")
-		coin, err := coinSrv.Get(id)
-
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"message": fmt.Sprint(fmt.Errorf("Couldn't satisify request: %w", err))})
-			return
-		}
+		coin := coinSrv.Get(id)
 
 		if coin.ID == "" {
 			logger.Debug("not found")

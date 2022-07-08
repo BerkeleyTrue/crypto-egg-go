@@ -5,10 +5,10 @@ import "github.com/berkeleytrue/crypto-egg-go/internal/core/domain"
 var apiUrl = "https://api.coingecko.com/api/v3/"
 
 type CoinRepo interface {
-	Get(id string) (domain.Coin, error)
-	GetBySymbol(sym string) (domain.Coin, error)
-	Update(id string, coin domain.Coin) (domain.Coin, error)
-	GetAll() ([]domain.Coin, error)
+	Get(id string) domain.Coin
+	GetBySymbol(sym string) domain.Coin
+	Update(id string, coin domain.Coin) domain.Coin
+	GetAll() []domain.Coin
 }
 
 type CoinGeckoApi interface {

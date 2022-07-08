@@ -25,24 +25,18 @@ func (srv *FlipSrv) Get() domain.Flippening {
 }
 
 func (srv *FlipSrv) Update() (domain.Flippening, error) {
-	btc, err := srv.coinSrv.Get("bitcoin")
-	if err != nil {
-		return domain.Flippening{}, fmt.Errorf("Couldn't fetch bitcoin market cap: %w", err)
-	}
+	btc := srv.coinSrv.Get("bitcoin")
 
 	if btc.MarketCap == 0 {
 		return domain.Flippening{}, fmt.Errorf("No bitcoin market cap returned")
 	}
 
-	eth, err := srv.coinSrv.Get("ethereum")
-
-	if err != nil {
-		return domain.Flippening{}, fmt.Errorf("Couldn't fetch ethereum market cap: %w", err)
-	}
+	eth := srv.coinSrv.Get("ethereum")
 
 	if eth.MarketCap == 0 {
 		return domain.Flippening{}, fmt.Errorf("No ethereum market cap returned")
 	}
+
 	var ratio float64 = float64(eth.MarketCap) / float64(btc.MarketCap)
 
 	srv.repo.Update(ratio, eth.MarketCap, btc.MarketCap)
@@ -57,7 +51,6 @@ func (srv *FlipSrv) StartService(coinsStream chan []domain.Coin) func() {
 		for {
 			select {
 			case coins := <-coinsStream:
-				logger.Info("coin updated")
 				hasBtc := false
 				hasEth := false
 
