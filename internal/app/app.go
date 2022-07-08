@@ -31,7 +31,7 @@ func Run(cfg *config.Config) {
 	gasSrv := services.CreateGasSrv(gasrepo.CreateMemRepo(), gasapi.CreateGasApi())
 
 	handler := ginInfra.CreateGinHandler(cfg)
-	basedriver.NewRouter(handler, coinSrv)
+	basedriver.NewRouter(handler, coinSrv, cfg)
 
 	api := handler.Group("/api")
 	coindriver.AddCoinRoutes(api, coinSrv)
