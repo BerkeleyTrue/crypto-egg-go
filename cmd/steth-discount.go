@@ -10,11 +10,11 @@ import (
 	"gopkg.in/h2non/gentleman.v2"
 )
 
-var priceCmd = &cobra.Command{
-	Use:   "price [sym]",
-	Short: "Get the price of a coin",
-	Long:  `Get the current price of a coin`,
-	Args:  cobra.MinimumNArgs(1),
+var stethCommand = &cobra.Command{
+	Use:   "steth",
+	Short: "Get the current steth discount",
+	Long:  `Get the current current discount on steth`,
+	Args:  cobra.MinimumNArgs(0),
 	PreRun: func(cmd *cobra.Command, args []string) {
 		logger := zap.NewExample().Sugar()
 		defer logger.Sync()
@@ -28,13 +28,10 @@ var priceCmd = &cobra.Command{
 		defer logger.Sync()
 
 		client := cmd.Context().Value("client").(*gentleman.Client)
-		sym := args[0]
-		// fmt.Printf("price called w/ %s\n", sym)
 
 		request := client.Request()
 
-		request.AddPath("/api/coins/sym/:sym")
-		request.Param("sym", sym)
+		request.AddPath("/api/coins")
 
 		res, err := request.Send()
 
@@ -50,16 +47,38 @@ var priceCmd = &cobra.Command{
 			return
 		}
 
-		coin := domain.Coin{}
-		err = res.JSON(&coin)
+		coins := []domain.Coin{}
+
+		err = res.JSON(&coins)
+
 		if err != nil {
 			logger.Fatalf("Couldn't parse response: %w", err)
 		}
 
-		utils.Formatter.PrintPrice(coin.Price)
+    if len(coins) <= 0 {
+      fmt.Println("0")
+      return
+    }
+
+    var eth domain.Coin
+    var steth domain.Coin
+
+    for _, coin := range coins {
+      if coin.Symbol == "eth" {
+        eth = coin
+      }
+
+      if coin.Symbol == "steth" {
+        steth = coin
+      }
+    }
+
+    discount := (eth.Price - steth.Price) / eth.Price * 100
+
+		utils.Formatter.PrintPrice(discount)
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(priceCmd)
+	rootCmd.AddCommand(stethCommand)
 }

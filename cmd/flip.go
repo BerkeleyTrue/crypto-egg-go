@@ -1,7 +1,3 @@
-/*
-Copyright © 2022 NAME HERE <EMAIL ADDRESS>
-
-*/
 package cmd
 
 import (
@@ -13,7 +9,6 @@ import (
 	"gopkg.in/h2non/gentleman.v2"
 )
 
-// flipCmd represents the flip command
 var flipCmd = &cobra.Command{
 	Use:   "flip",
 	Short: "Get the current flippening ratio",

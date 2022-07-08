@@ -33,4 +33,10 @@ func TestFormatPrice(t *testing.T) {
     res := utils.Formatter.FormatPrice(421264.2349293)
     c.Assert(res, quicktest.Equals, "421264\n")
   })
+
+  t.Run("Should preserve negative values", func(t *testing.T) {
+    c := quicktest.New(t)
+    res := utils.Formatter.FormatPrice(-4.2349293)
+    c.Assert(res, quicktest.Equals, "-4.23\n")
+  })
 }

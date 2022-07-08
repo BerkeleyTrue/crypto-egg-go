@@ -1,7 +1,3 @@
-/*
-Copyright © 2022 NAME HERE <EMAIL ADDRESS>
-
-*/
 package cmd
 
 import (
@@ -13,7 +9,6 @@ import (
 	"gopkg.in/h2non/gentleman.v2"
 )
 
-// gasCmd represents the gas command
 var gasCmd = &cobra.Command{
 	Use:   "gas",
 	Short: "Get current gas base fee for Ethereum",
